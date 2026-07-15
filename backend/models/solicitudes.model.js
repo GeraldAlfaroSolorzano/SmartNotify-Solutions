@@ -52,3 +52,23 @@ export async function obtenerSolicitudPorId(id) {
 
     return solicitudes[0];
 }
+
+export async function obtenerSolicitudes() {
+    const consulta = `
+        SELECT
+            id,
+            nombreCliente,
+            correo,
+            asunto,
+            descripcion,
+            estado,
+            fechaCreacion,
+            fechaActualizacion
+        FROM solicitudes
+        ORDER BY fechaCreacion DESC
+    `;
+
+    const [solicitudes] = await pool.query(consulta);
+
+    return solicitudes;
+}

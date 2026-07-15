@@ -13,8 +13,8 @@ function App() {
                 </span>
             </header>
 
-            <div className="row justify-content-center">
-                <div className="col-lg-8">
+            <div className="row g-4">
+                <div className="col-lg-7">
                     <section className="card shadow-sm">
                         <div className="card-body p-4">
                             <h2 className="h4 mb-4">
@@ -102,13 +102,67 @@ function App() {
                             </form>
                         </div>
                     </section>
-
-                    <div className="alert alert-info mt-4">
-                        El formulario utiliza POST tradicional. El
-                        navegador cambia de pagina y espera la respuesta
-                        del servidor.
-                    </div>
                 </div>
+
+                <div className="col-lg-5">
+                    <section className="card shadow-sm mb-4">
+                        <div className="card-body p-4">
+                            <h2 className="h4 mb-4">
+                                Consultar solicitud
+                            </h2>
+
+                            <form
+                                action="http://localhost:3000/api/solicitudes/consulta"
+                                method="GET"
+                            >
+                                <div className="mb-3">
+                                    <label
+                                        className="form-label"
+                                        htmlFor="id"
+                                    >
+                                        Identificador
+                                    </label>
+
+                                    <input
+                                        className="form-control"
+                                        id="id"
+                                        min="1"
+                                        name="id"
+                                        required
+                                        type="number"
+                                    />
+                                </div>
+
+                                <button
+                                    className="btn btn-outline-primary"
+                                    type="submit"
+                                >
+                                    Consultar solicitud
+                                </button>
+                            </form>
+                        </div>
+                    </section>
+
+                    <section className="card shadow-sm">
+                        <div className="card-body p-4">
+                            <h2 className="h4 mb-3">
+                                Todas las solicitudes
+                            </h2>
+
+                            <a
+                                className="btn btn-outline-secondary"
+                                href="http://localhost:3000/api/solicitudes"
+                            >
+                                Ver solicitudes
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div className="alert alert-info mt-4">
+                Los formularios utilizan GET y POST tradicionales. El
+                navegador recarga la pagina para mostrar la respuesta.
             </div>
         </main>
     );

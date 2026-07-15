@@ -1,8 +1,7 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 
 import app from "./app.js";
-
-dotenv.config();
+import { probarConexion } from "./config/database.js";
 
 let port = Number(process.env.PORT);
 
@@ -10,8 +9,20 @@ if (!port) {
     port = 3000;
 }
 
-app.listen(port, function servidorIniciado() {
-    console.log(
-        `Servidor ejecutandose en http://localhost:${port}`
-    );
-});
+async function iniciarServidor() {
+    try {
+        await probarConexion();
+
+        app.listen(port, function servidorIniciado() {
+            console.log(
+                `Servidor ejecutandose en http://localhost:${port}`
+            );
+        });
+    } catch (error) {
+        console.error("No fue posible iniciar el servidor");
+
+        process.exit(1);
+    }
+}
+
+iniciarServidor();

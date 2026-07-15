@@ -1,0 +1,14 @@
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f4f7fb;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+.card {
+    border: 0;
+}

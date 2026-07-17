@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     correo VARCHAR(150) NOT NULL,
     asunto VARCHAR(150) NOT NULL,
     descripcion TEXT NOT NULL,
+    informacionAdicional TEXT,
     estado ENUM(
         'Pendiente',
         'Asignada',
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS solicitudes (
         'Finalizada',
         'Cancelada'
     ) NOT NULL DEFAULT 'Pendiente',
+    solucionConfirmada BOOLEAN NOT NULL DEFAULT FALSE,
     fechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fechaActualizacion DATETIME NOT NULL
         DEFAULT CURRENT_TIMESTAMP

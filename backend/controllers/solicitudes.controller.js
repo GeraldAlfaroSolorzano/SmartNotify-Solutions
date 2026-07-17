@@ -8,41 +8,12 @@ import {
   obtenerSolicitudes,
 } from "../models/solicitudes.model.js";
 
-const estadosValidos = ["Pendiente", "Asignada", "En proceso", "Finalizada"];
-
-function textoVacio(valor) {
-  if (valor === undefined || valor === null) {
-    return true;
-  }
-
-  if (valor.trim() === "") {
-    return true;
-  }
-
-  return false;
-}
-
-function idValido(id) {
-  const numeroId = Number(id);
-
-  if (!Number.isInteger(numeroId)) {
-    return false;
-  }
-
-  if (numeroId <= 0) {
-    return false;
-  }
-
-  return true;
-}
-
 export async function listarSolicitudes(req, res) {
   try {
     const solicitudes = await obtenerSolicitudes();
 
     return res.status(200).json({
       success: true,
-      message: "Solicitudes obtenidas correctamente.",
       data: solicitudes,
     });
   } catch (error) {
@@ -57,13 +28,6 @@ export async function listarSolicitudes(req, res) {
 
 export async function consultarSolicitud(req, res) {
   try {
-    if (!idValido(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "El identificador no es valido.",
-      });
-    }
-
     const solicitud = await obtenerSolicitudPorId(req.params.id);
 
     if (!solicitud) {
@@ -75,7 +39,6 @@ export async function consultarSolicitud(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: "Solicitud obtenida correctamente.",
       data: solicitud,
     });
   } catch (error) {
@@ -90,21 +53,7 @@ export async function consultarSolicitud(req, res) {
 
 export async function registrarSolicitud(req, res) {
   try {
-    const datos = req.body;
-
-    if (
-      textoVacio(datos.nombreCliente) ||
-      textoVacio(datos.correo) ||
-      textoVacio(datos.asunto) ||
-      textoVacio(datos.descripcion)
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Todos los campos son requeridos.",
-      });
-    }
-
-    const solicitud = await crearSolicitud(datos);
+    const solicitud = await crearSolicitud(req.body);
 
     return res.status(201).json({
       success: true,
@@ -123,33 +72,17 @@ export async function registrarSolicitud(req, res) {
 
 export async function actualizarInformacionSolicitud(req, res) {
   try {
-    if (!idValido(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "El identificador no es valido.",
-      });
-    }
+    const solicitud = await actualizarInformacion(
+      req.params.id,
+      req.body.informacionAdicional,
+    );
 
-    if (textoVacio(req.body.informacionAdicional)) {
-      return res.status(400).json({
-        success: false,
-        message: "La informacion adicional es requerida.",
-      });
-    }
-
-    const solicitudActual = await obtenerSolicitudPorId(req.params.id);
-
-    if (!solicitudActual) {
+    if (!solicitud) {
       return res.status(404).json({
         success: false,
         message: "Solicitud no encontrada.",
       });
     }
-
-    const solicitud = await actualizarInformacion(
-      req.params.id,
-      req.body.informacionAdicional,
-    );
 
     return res.status(200).json({
       success: true,
@@ -168,30 +101,14 @@ export async function actualizarInformacionSolicitud(req, res) {
 
 export async function actualizarEstadoSolicitud(req, res) {
   try {
-    if (!idValido(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "El identificador no es valido.",
-      });
-    }
+    const solicitud = await actualizarEstado(req.params.id, req.body.estado);
 
-    if (!estadosValidos.includes(req.body.estado)) {
-      return res.status(400).json({
-        success: false,
-        message: "El estado no es valido.",
-      });
-    }
-
-    const solicitudActual = await obtenerSolicitudPorId(req.params.id);
-
-    if (!solicitudActual) {
+    if (!solicitud) {
       return res.status(404).json({
         success: false,
         message: "Solicitud no encontrada.",
       });
     }
-
-    const solicitud = await actualizarEstado(req.params.id, req.body.estado);
 
     return res.status(200).json({
       success: true,
@@ -210,23 +127,14 @@ export async function actualizarEstadoSolicitud(req, res) {
 
 export async function cancelarSolicitud(req, res) {
   try {
-    if (!idValido(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "El identificador no es valido.",
-      });
-    }
+    const solicitud = await cancelarSolicitudModelo(req.params.id);
 
-    const solicitudActual = await obtenerSolicitudPorId(req.params.id);
-
-    if (!solicitudActual) {
+    if (!solicitud) {
       return res.status(404).json({
         success: false,
         message: "Solicitud no encontrada.",
       });
     }
-
-    const solicitud = await cancelarSolicitudModelo(req.params.id);
 
     return res.status(200).json({
       success: true,
@@ -245,30 +153,14 @@ export async function cancelarSolicitud(req, res) {
 
 export async function confirmarSolucion(req, res) {
   try {
-    if (!idValido(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "El identificador no es valido.",
-      });
-    }
+    const solicitud = await confirmarSolucionModelo(req.params.id);
 
-    const solicitudActual = await obtenerSolicitudPorId(req.params.id);
-
-    if (!solicitudActual) {
+    if (!solicitud) {
       return res.status(404).json({
         success: false,
         message: "Solicitud no encontrada.",
       });
     }
-
-    if (solicitudActual.estado !== "Finalizada") {
-      return res.status(400).json({
-        success: false,
-        message: "La solicitud debe estar finalizada.",
-      });
-    }
-
-    const solicitud = await confirmarSolucionModelo(req.params.id);
 
     return res.status(200).json({
       success: true,

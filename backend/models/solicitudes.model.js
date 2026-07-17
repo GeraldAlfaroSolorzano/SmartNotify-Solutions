@@ -12,15 +12,37 @@ export async function crearSolicitud(datos) {
     `;
 
   const valores = [
-    datos.nombreCliente.trim(),
-    datos.correo.trim(),
-    datos.asunto.trim(),
-    datos.descripcion.trim(),
+    datos.nombreCliente,
+    datos.correo,
+    datos.asunto,
+    datos.descripcion,
   ];
 
   const [resultado] = await pool.execute(consulta, valores);
 
   return obtenerSolicitudPorId(resultado.insertId);
+}
+
+export async function obtenerSolicitudes() {
+  const consulta = `
+        SELECT
+            id,
+            nombreCliente,
+            correo,
+            asunto,
+            descripcion,
+            informacionAdicional,
+            estado,
+            solucionConfirmada,
+            fechaCreacion,
+            fechaActualizacion
+        FROM solicitudes
+        ORDER BY fechaCreacion DESC
+    `;
+
+  const [solicitudes] = await pool.query(consulta);
+
+  return solicitudes;
 }
 
 export async function obtenerSolicitudPorId(id) {
@@ -49,28 +71,6 @@ export async function obtenerSolicitudPorId(id) {
   return solicitudes[0];
 }
 
-export async function obtenerSolicitudes() {
-  const consulta = `
-        SELECT
-            id,
-            nombreCliente,
-            correo,
-            asunto,
-            descripcion,
-            informacionAdicional,
-            estado,
-            solucionConfirmada,
-            fechaCreacion,
-            fechaActualizacion
-        FROM solicitudes
-        ORDER BY fechaCreacion DESC
-    `;
-
-  const [solicitudes] = await pool.query(consulta);
-
-  return solicitudes;
-}
-
 export async function actualizarInformacion(id, informacionAdicional) {
   const consulta = `
         UPDATE solicitudes
@@ -78,7 +78,7 @@ export async function actualizarInformacion(id, informacionAdicional) {
         WHERE id = ?
     `;
 
-  await pool.execute(consulta, [informacionAdicional.trim(), id]);
+  await pool.execute(consulta, [informacionAdicional, id]);
 
   return obtenerSolicitudPorId(id);
 }

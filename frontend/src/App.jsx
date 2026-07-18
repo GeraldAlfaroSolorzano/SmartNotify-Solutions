@@ -48,16 +48,41 @@ function App() {
       setMensaje(error.message);
     }
   }, []);
+
   useEffect(
-    function iniciarPolling() {
+    function iniciarLongPolling() {
       cargarSolicitudes();
 
-      const intervalo = setInterval(function consultarSolicitudes() {
-        cargarSolicitudes();
-      }, 10000);
+      const controlador = new AbortController();
 
-      return function detenerPolling() {
-        clearInterval(intervalo);
+      async function escucharCambios() {
+        while (!controlador.signal.aborted) {
+          try {
+            const response = await fetch(`${API_URL}/long-polling`, {
+              signal: controlador.signal,
+            });
+
+            const resultado = await response.json();
+
+            if (!response.ok) {
+              throw new Error(resultado.message);
+            }
+
+            setSolicitudes(resultado.data);
+          } catch (error) {
+            if (error.name !== "AbortError") {
+              setMensaje(error.message);
+            }
+
+            break;
+          }
+        }
+      }
+
+      escucharCambios();
+
+      return function detenerLongPolling() {
+        controlador.abort();
       };
     },
     [cargarSolicitudes],
@@ -335,9 +360,7 @@ function App() {
 
         <p className="lead">Sistema de solicitudes de soporte tecnico</p>
 
-        <span className="badge text-bg-warning">
-          Etapa 3: Polling cada 10 segundos
-        </span>
+        <span className="badge text-bg-warning">Etapa 4: Long Polling</span>
       </header>
 
       {mostrarMensaje()}
@@ -599,7 +622,8 @@ function App() {
       </section>
 
       <div className="alert alert-info mt-4">
-        La lista se consulta automaticamente cada 10 segundos mediante polling.
+        El servidor mantiene la conexion abierta hasta que ocurre un cambio.
+        Despues, el cliente abre una nueva conexion.
       </div>
     </main>
   );

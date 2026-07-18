@@ -1,29 +1,56 @@
 import { Router } from "express";
 
 import {
-  actualizarEstadoSolicitud,
-  actualizarInformacionSolicitud,
-  cancelarSolicitud,
-  confirmarSolucion,
-  consultarSolicitud,
-  listarSolicitudes,
-  registrarSolicitud,
+    actualizarEstadoSolicitud,
+    actualizarInformacionSolicitud,
+    cancelarSolicitud,
+    confirmarSolucion,
+    consultarSolicitud,
+    esperarCambiosSolicitudes,
+    listarSolicitudes,
+    registrarSolicitud
 } from "../controllers/solicitudes.controller.js";
 
 const router = Router();
 
-router.get("/", listarSolicitudes);
+router.get(
+    "/long-polling",
+    esperarCambiosSolicitudes
+);
 
-router.get("/:id", consultarSolicitud);
+router.get(
+    "/",
+    listarSolicitudes
+);
 
-router.post("/", registrarSolicitud);
+router.get(
+    "/:id",
+    consultarSolicitud
+);
 
-router.put("/:id/informacion", actualizarInformacionSolicitud);
+router.post(
+    "/",
+    registrarSolicitud
+);
 
-router.put("/:id/estado", actualizarEstadoSolicitud);
+router.put(
+    "/:id/informacion",
+    actualizarInformacionSolicitud
+);
 
-router.put("/:id/cancelar", cancelarSolicitud);
+router.put(
+    "/:id/estado",
+    actualizarEstadoSolicitud
+);
 
-router.put("/:id/confirmar", confirmarSolucion);
+router.put(
+    "/:id/cancelar",
+    cancelarSolicitud
+);
+
+router.put(
+    "/:id/confirmar",
+    confirmarSolucion
+);
 
 export default router;

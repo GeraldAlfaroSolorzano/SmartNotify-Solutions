@@ -1,14 +1,23 @@
 body {
-    min-width: 320px;
-    min-height: 100vh;
-    margin: 0;
-    background-color: #f4f7fb;
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background-color: #f4f7fb;
 }
 
 #root {
-    min-height: 100vh;
+  min-height: 100vh;
 }
 
 .card {
-    border: 0;
+  border: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
 }

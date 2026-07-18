@@ -33,15 +33,32 @@ function App() {
         throw new Error(resultado.message);
       }
 
-      setSolicitudes(resultado.data);
+      setSolicitudes(function actualizarDatos(solicitudesActuales) {
+        const datosActuales = JSON.stringify(solicitudesActuales);
+
+        const datosNuevos = JSON.stringify(resultado.data);
+
+        if (datosActuales !== datosNuevos) {
+          return resultado.data;
+        }
+
+        return solicitudesActuales;
+      });
     } catch (error) {
       setMensaje(error.message);
     }
   }, []);
-
   useEffect(
-    function cargarDatosIniciales() {
+    function iniciarPolling() {
       cargarSolicitudes();
+
+      const intervalo = setInterval(function consultarSolicitudes() {
+        cargarSolicitudes();
+      }, 10000);
+
+      return function detenerPolling() {
+        clearInterval(intervalo);
+      };
     },
     [cargarSolicitudes],
   );
@@ -318,8 +335,8 @@ function App() {
 
         <p className="lead">Sistema de solicitudes de soporte tecnico</p>
 
-        <span className="badge text-bg-primary">
-          Etapa 2: Fetch y async await
+        <span className="badge text-bg-warning">
+          Etapa 3: Polling cada 10 segundos
         </span>
       </header>
 
@@ -582,8 +599,7 @@ function App() {
       </section>
 
       <div className="alert alert-info mt-4">
-        Las acciones utilizan fetch y async await. La pagina no se recarga
-        completamente.
+        La lista se consulta automaticamente cada 10 segundos mediante polling.
       </div>
     </main>
   );

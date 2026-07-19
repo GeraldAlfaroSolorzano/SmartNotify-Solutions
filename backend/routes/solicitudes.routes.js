@@ -5,18 +5,12 @@ import {
     actualizarInformacionSolicitud,
     cancelarSolicitud,
     confirmarSolucion,
-    conectarSse,
     consultarSolicitud,
     listarSolicitudes,
     registrarSolicitud
 } from "../controllers/solicitudes.controller.js";
 
 const router = Router();
-
-router.get(
-    "/eventos",
-    conectarSse
-);
 
 router.get(
     "/",

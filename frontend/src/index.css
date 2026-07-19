@@ -1,23 +1,81 @@
 body {
-  min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
-  background-color: #f4f7fb;
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f4f7fb;
 }
 
 #root {
-  min-height: 100vh;
+    min-height: 100vh;
 }
 
 .card {
-  border: 0;
+    border: 0;
 }
 
 textarea {
-  resize: vertical;
+    resize: vertical;
 }
 
 .table td,
 .table th {
-  vertical-align: middle;
+    vertical-align: middle;
+}
+
+.chat-contenedor {
+    min-height: 310px;
+    max-height: 410px;
+    padding: 16px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.chat-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-mensaje {
+    width: fit-content;
+    max-width: 75%;
+    padding: 10px 14px;
+    overflow-wrap: anywhere;
+    border-radius: 12px;
+}
+
+.chat-mensaje strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.chat-mensaje-cliente {
+    align-self: flex-start;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 3px;
+}
+
+.chat-mensaje-tecnico {
+    align-self: flex-end;
+    background-color: #dbeafe;
+    border: 1px solid #bfdbfe;
+    border-bottom-right-radius: 3px;
+}
+
+.chat-escribiendo {
+    margin-bottom: 12px;
+    font-style: italic;
+}
+
+@media (max-width: 991px) {
+    .chat-contenedor {
+        min-height: 250px;
+    }
+
+    .chat-mensaje {
+        max-width: 90%;
+    }
 }

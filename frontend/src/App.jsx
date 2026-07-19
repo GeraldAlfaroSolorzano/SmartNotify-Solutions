@@ -50,39 +50,43 @@ function App() {
   }, []);
 
   useEffect(
-    function iniciarLongPolling() {
+    function iniciarSse() {
       cargarSolicitudes();
 
-      const controlador = new AbortController();
+      const eventos = new EventSource(`${API_URL}/eventos`);
 
-      async function escucharCambios() {
-        while (!controlador.signal.aborted) {
-          try {
-            const response = await fetch(`${API_URL}/long-polling`, {
-              signal: controlador.signal,
-            });
+      eventos.onmessage = function recibirEvento(event) {
+        const datos = JSON.parse(event.data);
 
-            const resultado = await response.json();
+        setMensaje(datos.mensaje);
 
-            if (!response.ok) {
-              throw new Error(resultado.message);
-            }
+        setSolicitudes(function actualizarLista(solicitudesActuales) {
+          return solicitudesActuales.map(
+            function actualizarSolicitud(solicitud) {
+              if (solicitud.id === datos.solicitud.id) {
+                return datos.solicitud;
+              }
 
-            setSolicitudes(resultado.data);
-          } catch (error) {
-            if (error.name !== "AbortError") {
-              setMensaje(error.message);
-            }
+              return solicitud;
+            },
+          );
+        });
 
-            break;
+        setSolicitudConsultada(function actualizarConsulta(solicitudActual) {
+          if (!solicitudActual) {
+            return solicitudActual;
           }
-        }
-      }
 
-      escucharCambios();
+          if (solicitudActual.id === datos.solicitud.id) {
+            return datos.solicitud;
+          }
 
-      return function detenerLongPolling() {
-        controlador.abort();
+          return solicitudActual;
+        });
+      };
+
+      return function cerrarSse() {
+        eventos.close();
       };
     },
     [cargarSolicitudes],
@@ -360,7 +364,10 @@ function App() {
 
         <p className="lead">Sistema de solicitudes de soporte tecnico</p>
 
-        <span className="badge text-bg-warning">Etapa 4: Long Polling</span>
+        <span className="badge text-bg-primary">
+          {" "}
+          Etapa 5: Server-Sent Events
+        </span>
       </header>
 
       {mostrarMensaje()}
@@ -622,8 +629,8 @@ function App() {
       </section>
 
       <div className="alert alert-info mt-4">
-        El servidor mantiene la conexion abierta hasta que ocurre un cambio.
-        Despues, el cliente abre una nueva conexion.
+        El servidor envia automaticamente los cambios de estado mediante
+        Server-Sent Events.
       </div>
     </main>
   );

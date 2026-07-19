@@ -8,30 +8,45 @@ import {
     obtenerSolicitudes
 } from "../models/solicitudes.model.js";
 
-const conexionesLongPolling = new Set();
+const clientesSse = new Set();
 
-async function notificarCambiosSolicitudes() {
-    if (conexionesLongPolling.size === 0) {
-        return;
+function enviarCambioEstado(solicitud) {
+    const evento = {
+        mensaje:
+            `Solicitud #${solicitud.id} actualizada a ${solicitud.estado}`,
+        solicitud: solicitud
+    };
+
+    for (const cliente of clientesSse) {
+        cliente.write(
+            `data: ${JSON.stringify(evento)}\n\n`
+        );
     }
-
-    const solicitudes = await obtenerSolicitudes();
-
-    for (const respuesta of conexionesLongPolling) {
-        respuesta.status(200).json({
-            success: true,
-            data: solicitudes
-        });
-    }
-
-    conexionesLongPolling.clear();
 }
 
-export function esperarCambiosSolicitudes(req, res) {
-    conexionesLongPolling.add(res);
+export function conectarSse(req, res) {
+    res.setHeader(
+        "Content-Type",
+        "text/event-stream"
+    );
+
+    res.setHeader(
+        "Cache-Control",
+        "no-cache"
+    );
+
+    res.setHeader(
+        "Connection",
+        "keep-alive"
+    );
+
+    res.flushHeaders();
+
+    clientesSse.add(res);
 
     req.on("close", function cerrarConexion() {
-        conexionesLongPolling.delete(res);
+        clientesSse.delete(res);
+        res.end();
     });
 }
 
@@ -84,8 +99,6 @@ export async function registrarSolicitud(req, res) {
     try {
         const solicitud = await crearSolicitud(req.body);
 
-        await notificarCambiosSolicitudes();
-
         return res.status(201).json({
             success: true,
             message: "Solicitud registrada correctamente.",
@@ -118,8 +131,6 @@ export async function actualizarInformacionSolicitud(
             });
         }
 
-        await notificarCambiosSolicitudes();
-
         return res.status(200).json({
             success: true,
             message: "Informacion actualizada correctamente.",
@@ -149,7 +160,7 @@ export async function actualizarEstadoSolicitud(req, res) {
             });
         }
 
-        await notificarCambiosSolicitudes();
+        enviarCambioEstado(solicitud);
 
         return res.status(200).json({
             success: true,
@@ -179,8 +190,6 @@ export async function cancelarSolicitud(req, res) {
             });
         }
 
-        await notificarCambiosSolicitudes();
-
         return res.status(200).json({
             success: true,
             message: "Solicitud cancelada correctamente.",
@@ -208,8 +217,6 @@ export async function confirmarSolucion(req, res) {
                 message: "Solicitud no encontrada."
             });
         }
-
-        await notificarCambiosSolicitudes();
 
         return res.status(200).json({
             success: true,

@@ -5,8 +5,8 @@ import {
     actualizarInformacionSolicitud,
     cancelarSolicitud,
     confirmarSolucion,
+    conectarSse,
     consultarSolicitud,
-    esperarCambiosSolicitudes,
     listarSolicitudes,
     registrarSolicitud
 } from "../controllers/solicitudes.controller.js";
@@ -14,8 +14,8 @@ import {
 const router = Router();
 
 router.get(
-    "/long-polling",
-    esperarCambiosSolicitudes
+    "/eventos",
+    conectarSse
 );
 
 router.get(

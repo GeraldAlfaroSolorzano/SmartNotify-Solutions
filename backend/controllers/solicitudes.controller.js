@@ -8,48 +8,6 @@ import {
     obtenerSolicitudes
 } from "../models/solicitudes.model.js";
 
-const clientesSse = new Set();
-
-function enviarCambioEstado(solicitud) {
-    const evento = {
-        mensaje:
-            `Solicitud #${solicitud.id} actualizada a ${solicitud.estado}`,
-        solicitud: solicitud
-    };
-
-    for (const cliente of clientesSse) {
-        cliente.write(
-            `data: ${JSON.stringify(evento)}\n\n`
-        );
-    }
-}
-
-export function conectarSse(req, res) {
-    res.setHeader(
-        "Content-Type",
-        "text/event-stream"
-    );
-
-    res.setHeader(
-        "Cache-Control",
-        "no-cache"
-    );
-
-    res.setHeader(
-        "Connection",
-        "keep-alive"
-    );
-
-    res.flushHeaders();
-
-    clientesSse.add(res);
-
-    req.on("close", function cerrarConexion() {
-        clientesSse.delete(res);
-        res.end();
-    });
-}
-
 export async function listarSolicitudes(req, res) {
     try {
         const solicitudes = await obtenerSolicitudes();
@@ -160,7 +118,12 @@ export async function actualizarEstadoSolicitud(req, res) {
             });
         }
 
-        enviarCambioEstado(solicitud);
+        const io = req.app.get("io");
+
+        io.emit(
+            "estado-solicitud",
+            solicitud
+        );
 
         return res.status(200).json({
             success: true,

@@ -24,6 +24,8 @@ const formularioInicial = {
 };
 
 function App() {
+    const [enviando, setEnviando] = useState(false);
+
     const [formulario, setFormulario] = useState(
         formularioInicial
     );
@@ -223,6 +225,12 @@ function App() {
     async function registrarSolicitud(event) {
         event.preventDefault();
 
+        if (enviando) {
+            return;
+        }
+
+        setEnviando(true);
+
         try {
             const response = await fetch(
                 API_URL,
@@ -256,6 +264,8 @@ function App() {
             await cargarSolicitudes();
         } catch (error) {
             setMensaje(error.message);
+        } finally {
+            setEnviando(false);
         }
     }
 
@@ -788,7 +798,7 @@ function App() {
                 </p>
 
                 <span className="badge text-bg-primary">
-                    Etapa 6: WebSockets
+                    Etapa 7: Correos y formularios
                 </span>
             </header>
 
@@ -898,9 +908,12 @@ function App() {
 
                                 <button
                                     className="btn btn-primary"
+                                    disabled={enviando}
                                     type="submit"
                                 >
-                                    Registrar solicitud
+                                    {enviando
+                                        ? "Enviando..."
+                                        : "Registrar solicitud"}
                                 </button>
                             </form>
                         </div>
@@ -1203,9 +1216,8 @@ function App() {
             </section>
 
             <div className="alert alert-info mt-4">
-                El chat, el indicador de escritura y los
-                cambios de estado se comunican en tiempo
-                real mediante WebSockets.
+                El sistema envia correos cuando cambia el estado
+                e incluye enlaces y formularios interactivos.
             </div>
         </main>
     );

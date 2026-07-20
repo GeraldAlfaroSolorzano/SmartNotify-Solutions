@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import cors from "cors";
 import express from "express";
 
@@ -5,7 +7,9 @@ import solicitudesRoutes from "./routes/solicitudes.routes.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL
+}));
 
 app.use(express.json());
 

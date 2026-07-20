@@ -8,7 +8,7 @@ import { probarConexion } from "./config/database.js";
 
 let port = Number(process.env.PORT);
 
-if (!port) {
+if (!Number.isInteger(port)) {
     port = 3000;
 }
 
@@ -31,9 +31,30 @@ io.on("connection", function manejarConexion(socket) {
     socket.on(
         "mensaje-chat",
         function recibirMensaje(mensaje) {
+            if (!mensaje || typeof mensaje !== "object") {
+                return;
+            }
+
+            if (
+                mensaje.remitente !== "Cliente" &&
+                mensaje.remitente !== "Tecnico"
+            ) {
+                return;
+            }
+
+            if (
+                typeof mensaje.texto !== "string" ||
+                mensaje.texto.trim() === ""
+            ) {
+                return;
+            }
+
             io.emit(
                 "mensaje-chat",
-                mensaje
+                {
+                    remitente: mensaje.remitente,
+                    texto: mensaje.texto.trim()
+                }
             );
         }
     );
@@ -41,6 +62,10 @@ io.on("connection", function manejarConexion(socket) {
     socket.on(
         "tecnico-escribiendo",
         function recibirEstadoEscritura(estado) {
+            if (typeof estado !== "boolean") {
+                return;
+            }
+
             socket.broadcast.emit(
                 "tecnico-escribiendo",
                 estado
@@ -63,10 +88,7 @@ async function iniciarServidor() {
         );
     } catch (error) {
         console.error(error);
-
-        console.error(
-            "No fue posible iniciar el servidor"
-        );
+        console.error("No fue posible iniciar el servidor");
 
         process.exit(1);
     }

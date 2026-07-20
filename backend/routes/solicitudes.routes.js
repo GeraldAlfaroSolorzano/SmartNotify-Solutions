@@ -4,9 +4,14 @@ import {
     actualizarEstadoSolicitud,
     actualizarInformacionSolicitud,
     cancelarSolicitud,
+    cancelarSolicitudCorreo,
     confirmarSolucion,
+    confirmarSolucionCorreo,
     consultarSolicitud,
     listarSolicitudes,
+    mostrarFormularioCorreo,
+    mostrarVistaSolicitud,
+    procesarFormularioCorreo,
     registrarSolicitud
 } from "../controllers/solicitudes.controller.js";
 
@@ -17,14 +22,34 @@ router.get(
     listarSolicitudes
 );
 
-router.get(
-    "/:id",
-    consultarSolicitud
-);
-
 router.post(
     "/",
     registrarSolicitud
+);
+
+router.get(
+    "/:id/vista",
+    mostrarVistaSolicitud
+);
+
+router.get(
+    "/:id/formulario",
+    mostrarFormularioCorreo
+);
+
+router.post(
+    "/:id/formulario",
+    procesarFormularioCorreo
+);
+
+router.get(
+    "/:id/cancelar-correo",
+    cancelarSolicitudCorreo
+);
+
+router.get(
+    "/:id/confirmar-correo",
+    confirmarSolucionCorreo
 );
 
 router.put(
@@ -45,6 +70,11 @@ router.put(
 router.put(
     "/:id/confirmar",
     confirmarSolucion
+);
+
+router.get(
+    "/:id",
+    consultarSolicitud
 );
 
 export default router;
